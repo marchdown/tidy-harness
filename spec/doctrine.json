@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "about": "Doctrine rules as DATA. Every implementation (Swift core, bb reference scorecard, any future page/app) reads this file; none hardcodes a pattern. Change a rule here, and conformance (./conform.sh) shows which implementations disagree.",
+  "markers": { "doneWhen": "Done when:", "gatePhase": "Phase 1 of 2", "verified": "Verified:" },
+  "levels": ["edited", "compiled", "tested", "deployed"],
+  "claimLevelsNeedingARun": ["tested", "deployed"],
+  "mutatingTools": ["write", "edit"],
+  "networkPattern": "\\b(curl|ssh|wget|rsync|scp|git (push|clone|fetch|pull))\\b",
+  "timeoutGuardPattern": "(timeout |alarm|--max-time|-m \\d|ConnectTimeout)",
+  "probeCwdPrefix": "/private/tmp"
+}
