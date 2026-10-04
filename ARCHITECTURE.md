@@ -34,3 +34,21 @@ A harness is a **pure function over an event log**. Everything else is an interp
 
 ## Drift
 - None yet. The macOS app, gates and adapters are *planned*, not built; do not read them as present.
+
+## Integration map (how the pieces fit; dependency arrows point at what is depended on)
+    doctrine text (pi-doctrine-prod/*.md, ~/.pi/agent, CLAUDE.md)   <-- cited by -- spec/doctrine.json `rules[].source`
+    spec/doctrine.json   (this repo: the ONE source of rule data and the catalog)
+        ^ read by                 ^ read by                           ^ checked against
+    HarnessCore (Swift, pure)   reference/scorecard.bb (bb)          ~/pi-harness/eval/probes.edn  (catalog-check.sh)
+        ^ must conform exactly to the reference on the same logs (conform.sh)
+    clients: `harness` CLI · (planned) macOS app = Tzav terminal cores + guard + ledger · doctrine page (pi-doctrine-prod/gui)
+    unrelated by design: ~/subdomrails `share` only publishes a directory; it knows nothing about the harness.
+
+Direction rules: nothing here depends on another repo's unmerged branch. `pi-doctrine-prod/bin/scorecard.bb` is a wrapper that
+forwards to `reference/scorecard.bb`, so there is one lens, not two that drift. Probes are a *sensor* (controlled runs), the lens
+is a *sensor* (real logs), gates are *enforcement*; the catalog is the only place all three meet.
+
+## Known gaps in the integration (checked facts, not hopes)
+- `rules[].source` is free text. Nothing yet verifies that the cited doc section still exists (OPEN: anchor check).
+- Seven probes have no lens predicate (probed but never measured in real logs); three lens predicates have no probe. `harness rules` lists them.
+- Gates are `planned` except `done-when-two-phase`, which exists only as a pi extension (`~/.pi/agent/extensions/done-when-gate.ts`), not in this core.

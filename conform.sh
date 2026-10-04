@@ -7,7 +7,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 SRC="${1:-$HOME/.pi/agent/sessions}"
-REF="${SCORECARD_BB:-$HOME/pi-doctrine-prod/bin/scorecard.bb}"
+REF="${SCORECARD_BB:-$PWD/reference/scorecard.bb}"
 SNAP="$(mktemp -d -t conform)"
 trap 'rm -rf "$SNAP"' EXIT
 

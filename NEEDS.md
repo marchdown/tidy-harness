@@ -13,3 +13,9 @@
 - Name/home for the repo (working name tidy-harness at ~/tidy-harness) and a private remote (none exists yet).
 - Whether the app forks KELIM's chassis (Atelier/Kelim.swift) or only the terminal cores.
 _updated: 2026-10-04 · session: ~/.claude/projects/-Users-uprootiny-subdomrails/fe40f5a3-bf37-42dd-b606-f6988eb9931b_
+
+## Integration pass (2026-10-04)
+- Spec gained `rules` catalog (13 rules, each with source + sensors); refused at load if unsourced, unmeasured, duplicate, or naming an unknown lens. 21 tests.
+- `harness rules` prints the matrix + gaps. catalog-check.sh: catalog == probes.edn (11 probes) — fails on an unknown probe (negative control done).
+- Reference scorecard moved INTO this repo (reference/scorecard.bb); conform.sh no longer depends on another repo's branch; pi-doctrine-prod/bin/scorecard.bb is a forwarding wrapper (identical summary hash verified; fails loud with exit 2 if moved).
+- OPEN: doc-anchor check for rule sources; lens predicates for the 7 probe-only rules (no-python-node, no-homebrew, keys-are-intentional, snapshot-before-destroy, no-heredoc-over-ssh, read-narrowly, fail-loud); first real gates.

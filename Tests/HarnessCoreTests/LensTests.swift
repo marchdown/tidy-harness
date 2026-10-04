@@ -167,3 +167,49 @@ struct PurityTests {
         }
     }
 }
+
+@Suite("The rule catalog ties doctrine text to its sensors")
+struct CatalogTests {
+    private func spec(rules: String) -> Data {
+        Data(#"{"version":1,"markers":{"doneWhen":"a","gatePhase":"b","verified":"c"},"levels":["x"],"claimLevelsNeedingARun":[],"mutatingTools":[],"networkPattern":"a","timeoutGuardPattern":"x","probeCwdPrefix":"/","rules":\#(rules)}"#.utf8)
+    }
+
+    @Test func everyLensPredicateIsClaimedByARule() {
+        // a measurement with no stated purpose is noise: the real catalog must claim all of them
+        #expect(doctrine.orphanLenses.isEmpty, "unclaimed lens predicates: \(doctrine.orphanLenses)")
+    }
+
+    @Test func everyRuleHasASourceAndASensor() {
+        #expect(doctrine.rules.count >= 10)
+        for r in doctrine.rules {
+            #expect(!r.source.isEmpty, "\(r.id) has no source")
+            #expect(!r.sensors.isEmpty, "\(r.id) has no sensor")
+        }
+        #expect(Set(doctrine.rules.map(\.id)).count == doctrine.rules.count)
+    }
+
+    @Test func aRuleNobodyMeasuresIsRefusedAtLoad() {
+        #expect(throws: Doctrine.SpecError.unmeasuredRule("r")) {
+            try Doctrine.decode(spec(rules: #"[{"id":"r","source":"s","probes":[]}]"#))
+        }
+    }
+    @Test func aRuleWithoutASourceIsRefused() {
+        #expect(throws: Doctrine.SpecError.unsourcedRule("r")) {
+            try Doctrine.decode(spec(rules: #"[{"id":"r","source":" ","probes":["p"]}]"#))
+        }
+    }
+    @Test func duplicateIdsAndUnknownLensesAreRefused() {
+        #expect(throws: Doctrine.SpecError.duplicateRule("r")) {
+            try Doctrine.decode(spec(rules: #"[{"id":"r","source":"s","probes":["p"]},{"id":"r","source":"s","probes":["p"]}]"#))
+        }
+        #expect(throws: Doctrine.SpecError.unknownLens(rule: "r", lens: "nope")) {
+            try Doctrine.decode(spec(rules: #"[{"id":"r","source":"s","lens":"nope","probes":[]}]"#))
+        }
+    }
+    @Test func catalogRendersTheGaps() {
+        let text = doctrine.renderCatalog()
+        #expect(text.contains("measured in real logs but never probed:"))
+        #expect(text.contains("read-before-overwrite"))     // lens-only today
+        #expect(text.contains("no-python-node"))            // probe-only today
+    }
+}

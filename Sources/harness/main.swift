@@ -11,7 +11,9 @@ func fail(_ msg: String, _ code: Int32) -> Never {
 }
 
 var args = Array(CommandLine.arguments.dropFirst())
-guard args.first == "lens" else { fail("usage: harness lens [sessions-dir] [--spec spec/doctrine.json] [--json]", 2) }
+guard let cmd = args.first, ["lens", "rules"].contains(cmd) else {
+    fail("usage: harness lens [sessions-dir] [--spec spec/doctrine.json] [--json]\n       harness rules [--spec spec/doctrine.json]   (the rule catalog: sources, sensors, gaps)", 2)
+}
 args.removeFirst()
 
 @MainActor func value(of flag: String) -> String? {
@@ -27,6 +29,8 @@ let dirPath = args.first ?? (NSHomeDirectory() + "/.pi/agent/sessions")
 let doctrine: Doctrine
 do { doctrine = try Doctrine.decode(try Data(contentsOf: URL(fileURLWithPath: specPath))) }
 catch { fail("cannot load spec \(specPath): \(error)", 2) }
+
+if cmd == "rules" { print(doctrine.renderCatalog()); exit(0) }
 
 guard let walker = FileManager.default.enumerator(at: URL(fileURLWithPath: dirPath), includingPropertiesForKeys: nil) else {
     fail("cannot read directory \(dirPath)", 2)
