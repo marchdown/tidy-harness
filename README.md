@@ -14,3 +14,8 @@ Needs: Swift 6.1 (Command Line Tools is enough, no Xcode), `jq`, `bb` (babashka)
 Status: slice 2. `HarnessCore` reads the pi session log and computes the deterministic lens; it agrees exactly with the
 bb reference on every real session. The rule catalog ties doctrine text to its sensors and shows the gaps.
 Gates, model/tool adapters and the macOS app do not exist yet — see NEEDS.md.
+
+UI legibility (a design brief made checkable): `bb ui/legibility.bb page.html` — WCAG contrast of every text/graphic colour in both
+colour schemes (resolving `var()` aliases), viewport/lang/title, smallest font vs the HIG floor, focus ring, reduced motion,
+touch targets, non-keyboard click targets. Read-only; exit 1 on any FAIL. It cannot judge "comprehensible at a glance": it
+prints that checklist for a human. Calibrated against the doctrine page, beast, and a deliberately illegible page.
