@@ -1,11 +1,18 @@
 #!/usr/bin/env bash
 # catalog-check.sh — the rule catalog and the controlled probes must describe the same world.
-#   every probe in ~/pi-harness/eval/probes.edn is claimed by exactly one catalog rule,
-#   and every probe a rule claims exists. Nonzero exit on any mismatch; never silently skipped.
+#   every probe in the probes file is claimed by exactly one catalog rule,
+#   and every probe a rule claims exists. Nonzero exit on any mismatch.
+# The probes file is a local input (it lives with the agent harness, not here). When it is
+# absent the check is SKIPPED LOUDLY: it says so on stdout, writes a marker, and exits 0,
+# so check.sh can report "green with skips" rather than lie or die.
 set -euo pipefail
 cd "$(dirname "$0")"
 PROBES="${PROBES_EDN:-$HOME/pi-harness/eval/probes.edn}"
-[ -f "$PROBES" ] || { echo "no probes file at $PROBES (set PROBES_EDN)" >&2; exit 2; }
+if [ ! -f "$PROBES" ]; then
+  echo "SKIPPED catalog-vs-probes: no probes file at $PROBES (set PROBES_EDN to run it)"
+  echo catalog >> "${CHECK_SKIPS:-/dev/null}"
+  exit 0
+fi
 command -v jq >/dev/null || { echo "jq is required" >&2; exit 2; }
 
 have=$(grep -o -E ':id :[a-z0-9-]+' "$PROBES" | sed 's/^:id ://' | sort -u)

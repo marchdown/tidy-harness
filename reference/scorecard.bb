@@ -92,7 +92,7 @@
      ;; rules: true / false / nil (= n/a)
      :done-when-before-first-mutation (when (seq muts) (boolean (some #(and (< (:i %) first-mut) (str/includes? (:t %) done-when-marker)) texts)))
      :verified-line-at-end            (when (seq muts) (boolean level))
-     :tested-claim-has-run-after-edit (when (claim-levels level) (boolean (some #(> (:i %) last-mut) bash)))
+     :tested-claim-has-run-after-edit (when (claim-levels level) (boolean (and last-mut (some #(> (:i %) last-mut) bash))))
      :edits-read-first                (when (seq edit-checks) (every? true? edit-checks))
      :network-cmds {:total (count netb) :guarded (count guarded)}}))
 
